@@ -16,7 +16,11 @@ toggleEmptyState()
 addButton.addEventListener('click', () => {
     const task = todoInput.value.trim()
 
-    if(!task) return;
+     if(!task || task.length < 1) {
+        alert('Please enter a task!');
+        todoInput.focus(); 
+        return;
+     }
 
     const newTask = {
         id: Date.now(),
@@ -26,6 +30,7 @@ addButton.addEventListener('click', () => {
   }
 
   tasks.push(newTask)
+   renderTask(newTask)
   saveTask()
   updateStats()
   toggleEmptyState()
@@ -33,6 +38,12 @@ addButton.addEventListener('click', () => {
 
   todoInput.value = '';
 })
+
+todoInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        addButton.click();
+    }
+});
 
 function updateStats(){
     const totalTasks = tasks.length;
@@ -64,7 +75,8 @@ filters.addEventListener('click', (e) => {
         const filterType = e.target.getAttribute('data-filter');
         showFilteredTasks(filterType);
     }
-});
+})
+
 
 function renderTask(tasks) {
     const emptyState = document.querySelector('#emptyState');
@@ -106,7 +118,7 @@ todoList.addEventListener('click', (e) => {
         todoItem.classList.toggle('completed');
         saveTask();
         updateStats();
-        toggleEmptyState()
+       
         
     }
 })
@@ -114,4 +126,25 @@ todoList.addEventListener('click', (e) => {
 function saveTask() {
     localStorage.setItem('tasks', JSON.stringify(tasks))
 }
+
+function showFilteredTasks(filterType) {
+    const allTaskItems = document.querySelectorAll('.todo-item');
+    
+    allTaskItems.forEach(taskItem => {
+        const isCompleted = taskItem.classList.contains('completed');
+        let shouldShow = false;
+        
+        if (filterType === 'all') {
+            shouldShow = true;
+        } else if (filterType === 'active') {
+            shouldShow = !isCompleted;
+        } else if (filterType === 'completed') {
+            shouldShow = isCompleted;
+        }
+        
+        taskItem.style.display = shouldShow ? 'flex' : 'none';
+    });
+}
+
+
 })
